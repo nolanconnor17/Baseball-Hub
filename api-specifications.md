@@ -2,153 +2,254 @@
 
 ## What This API Does
 
-This is the backend for my Baseball Hub app. It handles user accounts, lets users save their favorite teams/players, and gets baseball data from the MLB Stats API.
+This is the backend for my Baseball Hub app. It:
+
+- Handles user accounts (register/login)
+- Lets users save favorite teams/players
+- Fetches baseball data from the MLB Stats API and sends it to the frontend
 
 ## Tech Stack
 
 - Node.js + Express
-- MongoDB for storing users and favorites
-- MLB Stats API for all the baseball data
+- MongoDB (stores users + favorites + optional notes)
+- MLB Stats API (all baseball data)
 
 ---
 
-## Routes I Need to Build
+## Auth (User Accounts)
 
-### User Accounts
+### POST /api/auth/register
 
-**POST /api/auth/register**
+Create a new user account.
 
-- Create a new user account
-- Need: username, email, password
-- Returns: user info and token for logging in
+**Body:**
 
-**POST /api/auth/login**
+- username
+- email
+- password
 
-- Log in existing user
-- Need: username, password
-- Returns: token
+**Returns:**
 
-TODO: Figure out how long tokens should last (24 hours?)
+- token
+- user info (id, username, email)
 
----
+### POST /api/auth/login
 
-### Favorites (Need to be logged in)
+Log in an existing user.
 
-**GET /api/favorites**
+**Body:**
 
-- Get the current user's saved teams and players
-- Returns lists of team IDs and player IDs
+- username (or email, depending on final choice)
+- password
 
-**POST /api/favorites/teams/:teamId**
+**Returns:**
 
-- Add a team to favorites
-- Example: POST /api/favorites/teams/147 (for Yankees)
+- token
+- user info
 
-**DELETE /api/favorites/teams/:teamId**
+### GET /api/auth/me
 
-- Remove a team from favorites
+Get the currently logged-in user.
 
-**POST /api/favorites/players/:playerId**
+**Headers:**
 
-- Add a player to favorites
+- Authorization: Bearer <token>
 
-**DELETE /api/favorites/players/:playerId**
+**Returns:**
 
-- Remove a player from favorites
-
----
-
-### Getting Baseball Data (from MLB API)
-
-These routes will call the MLB Stats API and send the data to my frontend.
-
-**GET /api/mlb/standings**
-
-- Gets current standings for all teams
-- Will need to figure out how to format this nicely
-
-**GET /api/mlb/schedule**
-
-- Gets today's games
-- Shows home team, away team, game time
-
-**GET /api/mlb/teams/:teamId**
-
-- Gets info about one team
-- Team name, division, stadium, etc.
-
-**GET /api/mlb/teams/:teamId/roster**
-
-- Gets the roster for a team
-- List of all players
-
-**GET /api/mlb/players/:playerId**
-
-- Gets one player's info and stats
-- Name, position, batting average, home runs, etc.
-
-**GET /api/mlb/leaders**
-
-- Top players in different stats (home runs, batting average)
-- Might add this later if I have time
+- user info (id, username, email)
 
 ---
 
-## Notes Routes (Stretch Goal - Maybe Add Later)
+## Favorites (Must be logged in)
 
-If I have time, let users write notes about players or teams:
+Favorites are stored in one MongoDB document per user:
 
-**GET /api/notes** - get all my notes
-**POST /api/notes** - create a note
-**PUT /api/notes/:noteId** - edit a note
-**DELETE /api/notes/:noteId** - delete a note
+- favoriteTeams: [teamId, ...]
+- favoritePlayers: [playerId, ...]
+
+### GET /api/favorites
+
+Get the current user's saved favorites.
+
+**Headers:**
+
+- Authorization: Bearer <token>
+
+**Returns:**
+
+- favoriteTeams (array of MLB team IDs)
+- favoritePlayers (array of MLB player IDs)
+
+### POST /api/favorites/teams/:teamId
+
+Add a team to favorites.
+
+**Headers:**
+
+- Authorization: Bearer <token>
+
+**Returns:**
+
+- message
+- updated favorites
+
+### DELETE /api/favorites/teams/:teamId
+
+Remove a team from favorites.
+
+**Headers:**
+
+- Authorization: Bearer <token>
+
+**Returns:**
+
+- message
+- updated favorites
+
+### POST /api/favorites/players/:playerId
+
+Add a player to favorites.
+
+**Headers:**
+
+- Authorization: Bearer <token>
+
+**Returns:**
+
+- message
+- updated favorites
+
+### DELETE /api/favorites/players/:playerId
+
+Remove a player from favorites.
+
+**Headers:**
+
+- Authorization: Bearer <token>
+
+**Returns:**
+
+- message
+- updated favorites
 
 ---
 
-## Security Stuff
+## MLB Data (Public - No login required)
 
-- Passwords need to be hashed (use bcrypt)
-- Use JWT tokens for logged-in users
-- Some routes need authentication (favorites, notes)
-- MLB data routes don't need login
+These routes call the MLB Stats API and send the data back to the frontend.
+(They act like a “proxy” so the frontend doesn’t need to talk to MLB directly.)
+
+### GET /api/mlb/standings
+
+Get current MLB standings.
+
+**Returns (example ideas):**
+
+- team name
+- wins/losses
+- division
+- league
+
+### GET /api/mlb/schedule
+
+Get games for a date (defaults to today).
+
+**Query Params:**
+
+- date=YYYY-MM-DD (optional)
+
+**Returns (example ideas):**
+
+- home team
+- away team
+- game time
+- status (Final / Scheduled / In Progress)
+- scores (if available)
+
+### GET /api/mlb/teams
+
+Get a list of MLB teams.
+
+### GET /api/mlb/teams/:teamId
+
+Get info about one team.
+
+### GET /api/mlb/teams/:teamId/roster
+
+Get the roster for a team.
+
+### GET /api/mlb/players/search
+
+Search for players.
+
+**Query Params:**
+
+- q=NAME
+
+### GET /api/mlb/players/:playerId
+
+Get a player’s info + stats.
+
+### GET /api/mlb/leaders (optional)
+
+Get league leaders for stats (HR, AVG, etc.).
 
 ---
 
-## Things I Need to Figure Out
+## Notes (Optional / Stretch Goal)
 
-- How to handle errors properly
-- Should I cache MLB API responses so I'm not calling it constantly?
-- What if the MLB API is down?
-- How to test these routes (Postman?)
-- Need to look up the exact MLB API endpoints
+If implemented, users can create notes about teams/players.
+
+### GET /api/notes
+
+Get all my notes.
+
+### POST /api/notes
+
+Create a note.
+
+### PUT /api/notes/:noteId
+
+Edit a note.
+
+### DELETE /api/notes/:noteId
+
+Delete a note.
 
 ---
 
-## Example Request/Response
+## Security / Auth Rules
 
-**Register a user:**
+- Passwords are hashed with bcrypt (never store plain text passwords)
+- JWT tokens used for authentication
+- Favorites + Notes routes require login
+- MLB data routes do NOT require login
 
-```
+---
+
+## Things To Figure Out Later (Totally Normal)
+
+- Error handling (what messages to send)
+- What to do if MLB API is down
+- Whether to cache MLB responses
+- How to test routes (Postman + Jest/Supertest)
+- Exact MLB Stats API endpoints + formatting
+
+---
+
+## Example Requests
+
+### Register
+
 POST /api/auth/register
-Body: {
+
+Body:
+
+```json
+{
   "username": "baseballfan",
   "email": "fan@email.com",
   "password": "password123"
-}
-
-Response: {
-  "token": "some-jwt-token",
-  "user": { "id": "123", "username": "baseballfan" }
-}
-```
-
-**Add favorite team:**
-
-```
-POST /api/favorites/teams/147
-Headers: Authorization: Bearer token-here
-
-Response: {
-  "message": "Team added to favorites"
 }
 ```
