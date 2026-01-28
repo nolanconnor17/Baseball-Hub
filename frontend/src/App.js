@@ -6,7 +6,11 @@ import Games from './pages/Games';
 import Teams from './pages/Teams';
 import TeamDetail from './pages/TeamDetail';
 import PlayerDetail from './pages/PlayerDetail';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Favorites from './pages/Favorites';
 import './App.css';
+import StadiumDetail from './pages/StadiumDetail';
 
 function App() {
   return (
@@ -17,6 +21,20 @@ function App() {
           <Link to="/standings">Standings</Link>
           <Link to="/games">Games</Link>
           <Link to="/teams">Teams</Link>
+          {localStorage.getItem('token') && (
+            <Link to="/favorites">Favorites</Link>
+          )}
+          {localStorage.getItem('token') ? (
+            <button onClick={() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              window.location.href = '/';
+            }}>
+              Logout
+            </button>
+          ) : (
+            <Link to="/login">Login</Link>
+          )}
         </nav>
         
         <Routes>
@@ -26,6 +44,10 @@ function App() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:teamId" element={<TeamDetail />} />
           <Route path="/players/:playerId" element={<PlayerDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/stadiums/:venueId" element={<StadiumDetail />} />
         </Routes>
       </div>
     </Router>

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getPlayerById } from '../services/api';
+import { getPlayerById, addFavoritePlayer, removeFavoritePlayer } from '../services/api';
 
 function PlayerDetail() {
   const { playerId } = useParams();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedYear, setSelectedYear] = useState('2024');
 
   useEffect(() => {
     const fetchPlayer = async () => {
       try {
-        const data = await getPlayerById(playerId);
+        setLoading(true);
+        const data = await getPlayerById(playerId, selectedYear);
+        console.log('Player data:', data.people[0]);
         setPlayer(data.people[0]);
         setLoading(false);
       } catch (error) {
@@ -20,7 +24,28 @@ function PlayerDetail() {
     };
 
     fetchPlayer();
-  }, [playerId]);
+  }, [playerId, selectedYear]);
+
+  const handleFavorite = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      alert('Please login to add favorites');
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        await removeFavoritePlayer(playerId, token);
+        setIsFavorite(false);
+      } else {
+        await addFavoritePlayer(playerId, token);
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.log('Error updating favorite:', error);
+    }
+  };
 
   if (loading) {
     return <div>Loading player info...</div>;
@@ -36,6 +61,9 @@ function PlayerDetail() {
   return (
     <div className="player-detail">
       <h1>{player.fullName}</h1>
+      <button onClick={handleFavorite}>
+        {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+      </button>
       
       <div className="player-info">
         <p><strong>Position:</strong> {player.primaryPosition?.name}</p>
@@ -46,30 +74,46 @@ function PlayerDetail() {
         <p><strong>Birth Place:</strong> {player.birthCity}, {player.birthStateProvince}</p>
       </div>
 
-      {stats && (
-        <div className="player-stats">
-          <h2>Season Stats</h2>
-          {player.primaryPosition?.abbreviation === 'P' ? (
-            // Pitching stats
-            <div>
-              <p>ERA: {stats.era}</p>
-              <p>Wins: {stats.wins}</p>
-              <p>Losses: {stats.losses}</p>
-              <p>Strikeouts: {stats.strikeOuts}</p>
-              <p>Innings Pitched: {stats.inningsPitched}</p>
-            </div>
-          ) : (
-            // Batting stats
-            <div>
-              <p>AVG: {stats.avg}</p>
-              <p>Home Runs: {stats.homeRuns}</p>
-              <p>RBI: {stats.rbi}</p>
-              <p>Hits: {stats.hits}</p>
-              <p>Runs: {stats.runs}</p>
-            </div>
-          )}
+      <div className="player-stats">
+        <h2>Season Stats</h2>
+        
+        <div>
+          <label>Select Year: </label>
+          <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+            <option value="2020">2020</option>
+          </select>
         </div>
-      )}
+
+        {stats ? (
+          <div>
+            {player.primaryPosition?.abbreviation === 'P' ? (
+              // Pitching stats
+              <div>
+                <p>ERA: {stats.era}</p>
+                <p>Wins: {stats.wins}</p>
+                <p>Losses: {stats.losses}</p>
+                <p>Strikeouts: {stats.strikeOuts}</p>
+                <p>Innings Pitched: {stats.inningsPitched}</p>
+              </div>
+            ) : (
+              // Batting stats
+              <div>
+                <p>AVG: {stats.avg}</p>
+                <p>Home Runs: {stats.homeRuns}</p>
+                <p>RBI: {stats.rbi}</p>
+                <p>Hits: {stats.hits}</p>
+                <p>Runs: {stats.runs}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p>No stats available for {selectedYear}</p>
+        )}
+      </div>
     </div>
   );
 }

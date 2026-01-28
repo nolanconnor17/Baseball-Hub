@@ -1,38 +1,228 @@
+body {
+  background-image: url('./BoysinDugout3.jpg');
+  background-size: 80%;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: repeat;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Navigation */
+nav {
+  background-color: #003087;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 1rem;
+}
+
+nav a {
   color: white;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-.App-link {
-  color: #61dafb;
+nav button {
+  background-color: #d50032;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+nav button:hover {
+  background-color: #a00025;
+}
+
+/* Page layout */
+.homepage,
+.standings,
+.games,
+.teams,
+.team-detail,
+.player-detail,
+.login,
+.register,
+.favorites {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  color: #003087;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  color: #003087;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Homepage */
+.nav-links {
+  margin-top: 2rem;
+}
+
+.nav-links button {
+  background-color: #003087;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin-right: 1rem;
+}
+
+.nav-links button:hover {
+  background-color: #002060;
+}
+
+/* Standings */
+.division {
+  margin-bottom: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  margin-top: 1rem;
+}
+
+th {
+  background-color: #003087;
+  color: white;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Games */
+.games input {
+  padding: 0.5rem;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+}
+
+.game-card {
+  background-color: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+}
+
+.game-info {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.score {
+  font-weight: bold;
+  color: #003087;
+  margin-top: 0.5rem;
+}
+
+/* Teams */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.team-card {
+  background-color: white;
+  padding: 1rem;
+  text-decoration: none;
+  color: black;
+  border: 1px solid #ddd;
+}
+
+.team-card h3 {
+  color: #003087;
+  margin-bottom: 0.5rem;
+}
+
+.team-card p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.25rem 0;
+}
+
+/* Team / Player detail */
+.team-info,
+.player-info,
+.player-stats {
+  background-color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.roster,
+.players-list,
+.teams-list {
+  margin-top: 1rem;
+}
+
+.player-card,
+.favorite-item {
+  background-color: white;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  color: black;
+  border: 1px solid #ddd;
+}
+
+/* Forms */
+form {
+  background-color: white;
+  padding: 1.5rem;
+  max-width: 400px;
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+}
+
+form div {
+  margin-bottom: 1rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+form button {
+  background-color: #003087;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  width: 100%;
+}
+
+form button:hover {
+  background-color: #002060;
+}
+
+.error {
+  color: #d50032;
+  margin-top: 0.5rem;
+}
+
+/* Favorites */
+.favorites-section {
+  margin: 2rem 0;
 }

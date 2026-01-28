@@ -6,7 +6,6 @@ const API_BASE = "http://localhost:3001/api";
 /* =========================
    AUTH API CALLS
 ========================= */
-
 export const register = async (userData) => {
   const response = await axios.post(
     `${API_BASE}/auth/register`,
@@ -26,7 +25,6 @@ export const login = async (credentials) => {
 /* =========================
    MLB API CALLS
 ========================= */
-
 export const getStandings = async () => {
   const response = await axios.get(
     `${API_BASE}/mlb/standings`
@@ -38,7 +36,6 @@ export const getSchedule = async (date) => {
   const url = date
     ? `${API_BASE}/mlb/schedule?date=${date}`
     : `${API_BASE}/mlb/schedule`;
-
   const response = await axios.get(url);
   return response.data;
 };
@@ -64,10 +61,19 @@ export const getTeamRoster = async (teamId) => {
   return response.data;
 };
 
-export const getPlayerById = async (playerId) => {
+export const getStadiumById = async (venueId) => {
   const response = await axios.get(
-    `${API_BASE}/mlb/players/${playerId}`
+    `${API_BASE}/mlb/stadiums/${venueId}`
   );
+  return response.data;
+};
+
+export const getPlayerById = async (playerId, season) => {
+  const url = season
+    ? `${API_BASE}/mlb/players/${playerId}?season=${season}`
+    : `${API_BASE}/mlb/players/${playerId}`;
+  
+  const response = await axios.get(url);
   return response.data;
 };
 
@@ -82,7 +88,6 @@ export const searchPlayers = async (query) => {
    FAVORITES API CALLS
    (Requires Auth Token)
 ========================= */
-
 export const getFavorites = async (token) => {
   const response = await axios.get(
     `${API_BASE}/favorites`,

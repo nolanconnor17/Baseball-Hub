@@ -68,12 +68,28 @@ router.get("/teams/:teamId/roster", async (req, res) => {
   }
 });
 
+// Get stadium/venue info
+router.get("/stadiums/:venueId", async (req, res) => {
+  try {
+    const venueId = req.params.venueId;
+    const response = await axios.get(
+      `${MLB_API_BASE}/venues/${venueId}?hydrate=location,fieldInfo`
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error("Stadium error:", error.message);
+    res.status(500).json({ error: "Failed to fetch stadium info" });
+  }
+});
+
 // Get player info and stats
 router.get("/players/:playerId", async (req, res) => {
   try {
     const playerId = parseInt(req.params.playerId);
+    const season = req.query.season || new Date().getFullYear();
+    
     const response = await axios.get(
-      `${MLB_API_BASE}/people/${playerId}?hydrate=stats(type=season)`
+      `${MLB_API_BASE}/people/${playerId}?hydrate=stats(type=season,season=${season})`
     );
     res.json(response.data);
   } catch (error) {
@@ -86,9 +102,15 @@ router.get("/players/:playerId", async (req, res) => {
 router.get("/players/search", async (req, res) => {
   try {
     const searchName = req.query.q;
+
+    if (!searchName) {
+      return res.status(400).json({ error: "Missing q (example: ?q=Judge)" });
+    }
+
     const response = await axios.get(
-      `${MLB_API_BASE}/people/search?names=${searchName}`
+      `${MLB_API_BASE}/people/search?names=${encodeURIComponent(searchName)}`
     );
+
     res.json(response.data);
   } catch (error) {
     console.error("Search error:", error.message);
