@@ -7,14 +7,13 @@ function PlayerDetail() {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState('2025');
 
   useEffect(() => {
     const fetchPlayer = async () => {
       try {
         setLoading(true);
         const data = await getPlayerById(playerId, selectedYear);
-        console.log('Player data:', data.people[0]);
         setPlayer(data.people[0]);
         setLoading(false);
       } catch (error) {
@@ -68,10 +67,9 @@ function PlayerDetail() {
       <div className="player-info">
         <p><strong>Position:</strong> {player.primaryPosition?.name}</p>
         <p><strong>Number:</strong> #{player.primaryNumber}</p>
-        <p><strong>Team:</strong> {player.currentTeam?.name}</p>
         <p><strong>Age:</strong> {player.currentAge}</p>
         <p><strong>Birth Date:</strong> {player.birthDate}</p>
-        <p><strong>Birth Place:</strong> {player.birthCity}, {player.birthStateProvince}</p>
+        <p><strong>Birth Place:</strong> {player.birthCity}{player.birthStateProvince && `, ${player.birthStateProvince}`}, {player.birthCountry}</p>
       </div>
 
       <div className="player-stats">
@@ -80,6 +78,7 @@ function PlayerDetail() {
         <div>
           <label>Select Year: </label>
           <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+            <option value="2025">2025</option>
             <option value="2024">2024</option>
             <option value="2023">2023</option>
             <option value="2022">2022</option>

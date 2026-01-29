@@ -178,6 +178,11 @@ td {
   text-decoration: none;
   color: black;
   border: 1px solid #ddd;
+  display: block;
+}
+
+.player-card div {
+  margin: 0.25rem 0;
 }
 
 /* Forms */
@@ -225,4 +230,63 @@ form button:hover {
 /* Favorites */
 .favorites-section {
   margin: 2rem 0;
+}
+
+/* Player Comparison */
+.comparison-search {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.comparison-search div {
+  background-color: white;
+  padding: 1rem;
+  border: 1px solid #ddd;
+}
+
+.comparison-search input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+}
+
+.comparison-search button {
+  background-color: #003087;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.comparison-table {
+  margin-top: 2rem;
+  background-color: white;
+  padding: 1rem;
+}
+
+/* Stadium Detail */
+.stadium-detail {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.stadium-info {
+  background-color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.stadium-info p {
+  margin: 0.5rem 0;
+}
+
+.stadium-info div {
+  margin-top: 0.5rem;
+}
+
+.stadium-info div p {
+  margin-left: 0;
 }

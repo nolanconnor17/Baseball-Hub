@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getFavorites, getTeamById, getPlayerById } from '../services/api';
 
 function Favorites() {
   const [favoriteTeams, setFavoriteTeams] = useState([]);
   const [favoritePlayers, setFavoritePlayers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      const token = localStorage.getItem('token');
-      
       if (!token) {
-        navigate('/login');
+        setLoading(false);
         return;
       }
 
@@ -38,7 +37,19 @@ function Favorites() {
     };
 
     fetchFavorites();
-  }, [navigate]);
+  }, [token]);
+
+  // If not logged in, show message
+  if (!token) {
+    return (
+      <div className="favorites">
+        <h1>My Favorites</h1>
+        <p>
+          Please <Link to="/login">login</Link> or <Link to="/register">create an account</Link> to save your favorite teams and players.
+        </p>
+      </div>
+    );
+  }
 
   if (loading) {
     return <div>Loading favorites...</div>;

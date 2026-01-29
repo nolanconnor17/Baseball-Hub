@@ -82,23 +82,7 @@ router.get("/stadiums/:venueId", async (req, res) => {
   }
 });
 
-// Get player info and stats
-router.get("/players/:playerId", async (req, res) => {
-  try {
-    const playerId = parseInt(req.params.playerId);
-    const season = req.query.season || new Date().getFullYear();
-    
-    const response = await axios.get(
-      `${MLB_API_BASE}/people/${playerId}?hydrate=stats(type=season,season=${season})`
-    );
-    res.json(response.data);
-  } catch (error) {
-    console.log("Player error:", error.message);
-    res.status(500).json({ error: "Failed to fetch player info" });
-  }
-});
-
-// Search for players
+// Search for players (MUST come BEFORE /players/:playerId)
 router.get("/players/search", async (req, res) => {
   try {
     const searchName = req.query.q;
@@ -115,6 +99,34 @@ router.get("/players/search", async (req, res) => {
   } catch (error) {
     console.error("Search error:", error.message);
     res.status(500).json({ error: "Failed to search players" });
+  }
+});
+
+// Get player info and stats (MUST come AFTER /players/search)
+router.get("/players/:playerId", async (req, res) => {
+  try {
+    const playerId = parseInt(req.params.playerId);
+    const season = req.query.season;
+    
+    // Build hydrate parameter
+    let hydrate = 'stats(type=season)';
+    if (season) {
+      hydrate = `stats(type=season,season=${season})`;
+    }
+    
+    const response = await axios.get(
+      `${MLB_API_BASE}/people/${playerId}`,
+      {
+        params: {
+          hydrate: hydrate
+        }
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.log("Player error:", error.message);
+    console.log("Requested URL:", error.config?.url);
+    res.status(500).json({ error: "Failed to fetch player info" });
   }
 });
 
