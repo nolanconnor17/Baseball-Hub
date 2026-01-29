@@ -10,16 +10,19 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    console.log('Database:', mongoose.connection.name);
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err.message);
-    process.exit(1);
-  });
+// Connect to MongoDB (skip during tests)
+if (process.env.NODE_ENV !== "test") {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log("Connected to MongoDB");
+      console.log("Database:", mongoose.connection.name);
+    })
+    .catch((err) => {
+      console.error("MongoDB connection error:", err.message);
+      process.exit(1);
+    });
+}
+
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -41,6 +44,10 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

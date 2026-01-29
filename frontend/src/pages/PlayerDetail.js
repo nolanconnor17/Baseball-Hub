@@ -60,7 +60,18 @@ function PlayerDetail() {
   return (
     <div className="player-detail">
       <h1>{player.fullName}</h1>
-      <button onClick={handleFavorite}>
+    <img 
+        src={`https://securea.mlb.com/mlb/images/players/head_shot/${playerId}.jpg`}
+        alt={player.fullName}
+        onError={(e) => { e.target.style.display = 'none'; }}
+        style={{
+            width: '200px',
+            height: '200px',
+            borderRadius: '8px',
+            marginBottom: '1rem'
+        }}
+    />
+    <button onClick={handleFavorite}>
         {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
       </button>
       
@@ -84,6 +95,11 @@ function PlayerDetail() {
             <option value="2022">2022</option>
             <option value="2021">2021</option>
             <option value="2020">2020</option>
+            <option value="2019">2019</option>
+            <option value="2018">2018</option>
+            <option value="2017">2017</option>
+            <option value="2016">2016</option>
+            <option value="2015">2015</option>
           </select>
         </div>
 

@@ -34,11 +34,16 @@ function Teams() {
       
       <div className="teams-grid">
         {teams.map((team) => (
-          <Link to={`/teams/${team.id}`} key={team.id} className="team-card">
-            <h3>{team.name}</h3>
-            <p>{team.division.name}</p>
-            <p>{team.venue.name}</p>
-          </Link>
+      <Link to={`/teams/${team.id}`} key={team.id} className="team-card">
+      <img 
+        src={`https://www.mlbstatic.com/team-logos/${team.id}.svg`}
+        alt={team.name}
+        style={{width: '80px', height: '80px', marginBottom: '0.5rem'}}
+      />
+      <h3>{team.name}</h3>
+      <p>{team.division.name}</p>
+      <p>{team.venue.name}</p>
+    </Link>
         ))}
       </div>
     </div>

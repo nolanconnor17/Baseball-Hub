@@ -58,6 +58,11 @@ function TeamDetail() {
 
   return (
     <div className="team-detail">
+       <img 
+          src={`https://www.mlbstatic.com/team-logos/${team.id}.svg`}
+          alt={team.name}
+          style={{width: '100px', height: '100px', marginBottom: '1rem'}}
+      />
       <h1>{team.name}</h1>
       <button onClick={handleFavorite}>
         {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}

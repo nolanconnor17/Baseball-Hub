@@ -7,27 +7,27 @@ function Games() {
   const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        setLoading(true);
+        const data = await getSchedule(selectedDate);
+        setGames(data.dates?.[0]?.games || []);
+        setLoading(false);
+      } catch (error) {
+        console.log('Error fetching games:', error);
+        setLoading(false);
+      }
+    };
+
     fetchGames();
   }, [selectedDate]);
 
-  const fetchGames = async () => {
-    try {
-      setLoading(true);
-      const data = await getSchedule(selectedDate);
-      setGames(data.dates?.[0]?.games || []);
-      setLoading(false);
-    } catch (error) {
-      console.log('Error fetching games:', error);
-      setLoading(false);
-    }
-  };
-
   const formatTime = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
@@ -38,11 +38,11 @@ function Games() {
   return (
     <div className="games">
       <h1>MLB Games</h1>
-      
+
       <div>
         <label>Select Date: </label>
-        <input 
-          type="date" 
+        <input
+          type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
         />
@@ -54,20 +54,30 @@ function Games() {
         <div className="games-list">
           {games.map((game) => (
             <div key={game.gamePk} className="game-card">
-              <div className="teams">
-                <div>{game.teams.away.team.name}</div>
-                <div>@</div>
-                <div>{game.teams.home.team.name}</div>
-              </div>
+
               <div className="game-info">
                 <div>Status: {game.status.detailedState}</div>
                 <div>Time: {formatTime(game.gameDate)}</div>
-                {game.status.abstractGameState === 'Final' && (
-                  <div className="score">
-                    Score: {game.teams.away.score} - {game.teams.home.score}
-                  </div>
-                )}
               </div>
+
+              <div className="teams">
+                <div>
+                  {game.teams.away.team.name}
+                  {game.status.abstractGameState === 'Final' && (
+                    <strong> {game.teams.away.score}</strong>
+                  )}
+                </div>
+
+                <div>@</div>
+
+                <div>
+                  {game.teams.home.team.name}
+                  {game.status.abstractGameState === 'Final' && (
+                    <strong> {game.teams.home.score}</strong>
+                  )}
+                </div>
+              </div>
+
             </div>
           ))}
         </div>
