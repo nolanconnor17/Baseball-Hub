@@ -114,3 +114,7 @@ MLB Data:
 - GET /api/mlb/players/:playerId
 - GET /api/mlb/players/search
 - GET /api/mlb/stadiums/:venueId
+
+---
+
+_Submitted for USF Coding Bootcamp Capstone - January 2026_
