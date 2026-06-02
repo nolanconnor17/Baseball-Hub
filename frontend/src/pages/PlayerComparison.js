@@ -1,36 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { searchPlayers, getPlayerById } from "../services/api";
 
 function PlayerComparison() {
   const [searchTerm1, setSearchTerm1] = useState("");
   const [searchTerm2, setSearchTerm2] = useState("");
+  const [searchResults1, setSearchResults1] = useState([]);
+  const [searchResults2, setSearchResults2] = useState([]);
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
   const [year, setYear] = useState("2025");
   const [message, setMessage] = useState("");
 
-  const searchAndSetPlayer = async (searchTerm, setPlayer) => {
-    setMessage("");
-
-    if (!searchTerm.trim()) {
-      setMessage("Type a player name first.");
+  // Autocomplete search for Player 1
+  useEffect(() => {
+    if (searchTerm1.length < 2) {
+      setSearchResults1([]);
       return;
     }
 
-    try {
-      const results = await searchPlayers(searchTerm);
-
-      if (results.people && results.people.length > 0) {
-        const playerId = results.people[0].id;
-        const data = await getPlayerById(playerId, year);
-        setPlayer(data.people?.[0] || null);
-      } else {
-        setMessage(`No results found for "${searchTerm}"`);
-        setPlayer(null);
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchPlayers(searchTerm1);
+        setSearchResults1(results.people || []);
+      } catch (error) {
+        console.log("Search error:", error);
+        setSearchResults1([]);
       }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm1]);
+
+  // Autocomplete search for Player 2
+  useEffect(() => {
+    if (searchTerm2.length < 2) {
+      setSearchResults2([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchPlayers(searchTerm2);
+        setSearchResults2(results.people || []);
+      } catch (error) {
+        console.log("Search error:", error);
+        setSearchResults2([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm2]);
+
+  const selectPlayer = async (playerId, playerName, setPlayer, setSearchTerm, setSearchResults) => {
+    setSearchTerm(playerName);
+    setSearchResults([]);
+    setMessage("");
+
+    try {
+      const data = await getPlayerById(playerId, year);
+      setPlayer(data.people?.[0] || null);
     } catch (error) {
-      console.log("Search error:", error);
-      setMessage("Something went wrong searching.");
+      console.log("Error loading player:", error);
+      setMessage("Failed to load player stats.");
       setPlayer(null);
     }
   };
@@ -56,13 +87,6 @@ function PlayerComparison() {
   const stats1 = getStats(player1, isPitcher1);
   const stats2 = getStats(player2, isPitcher2);
 
-  // Debug logs
-  console.log('Player 1:', player1?.fullName, 'Position:', player1?.primaryPosition?.abbreviation);
-  console.log('Player 2:', player2?.fullName, 'Position:', player2?.primaryPosition?.abbreviation);
-  console.log('Stats 1:', stats1);
-  console.log('Stats 2:', stats2);
-  console.log('isPitcher1:', isPitcher1, 'isPitcher2:', isPitcher2);
-
   return (
     <div className="player-comparison">
       <h1>Compare Players</h1>
@@ -83,34 +107,90 @@ function PlayerComparison() {
           <option value="2015">2015</option>
         </select>
         <p style={{ fontSize: "0.9rem", color: "#666" }}>
-          (After changing year, click Search again for each player.)
+          (After changing year, re-select players from dropdown.)
         </p>
       </div>
 
       {message && <p className="error">{message}</p>}
 
       <div className="comparison-search">
-        <div>
+        <div style={{ position: 'relative' }}>
           <h3>Player 1</h3>
           <input
             type="text"
-            placeholder="Search player name"
+            placeholder="Type player name..."
             value={searchTerm1}
             onChange={(e) => setSearchTerm1(e.target.value)}
           />
-          <button onClick={() => searchAndSetPlayer(searchTerm1, setPlayer1)}>Search</button>
+          {searchResults1.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              backgroundColor: 'white',
+              border: '1px solid #ccc',
+              maxHeight: '200px',
+              overflowY: 'auto',
+              zIndex: 1000
+            }}>
+              {searchResults1.slice(0, 10).map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => selectPlayer(p.id, p.fullName, setPlayer1, setSearchTerm1, setSearchResults1)}
+                  style={{
+                    padding: '8px',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #eee'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                >
+                  {p.fullName}
+                </div>
+              ))}
+            </div>
+          )}
           {player1 && <p>Selected: {player1.fullName}</p>}
         </div>
 
-        <div>
+        <div style={{ position: 'relative' }}>
           <h3>Player 2</h3>
           <input
             type="text"
-            placeholder="Search player name"
+            placeholder="Type player name..."
             value={searchTerm2}
             onChange={(e) => setSearchTerm2(e.target.value)}
           />
-          <button onClick={() => searchAndSetPlayer(searchTerm2, setPlayer2)}>Search</button>
+          {searchResults2.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              backgroundColor: 'white',
+              border: '1px solid #ccc',
+              maxHeight: '200px',
+              overflowY: 'auto',
+              zIndex: 1000
+            }}>
+              {searchResults2.slice(0, 10).map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => selectPlayer(p.id, p.fullName, setPlayer2, setSearchTerm2, setSearchResults2)}
+                  style={{
+                    padding: '8px',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #eee'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                >
+                  {p.fullName}
+                </div>
+              ))}
+            </div>
+          )}
           {player2 && <p>Selected: {player2.fullName}</p>}
         </div>
       </div>
